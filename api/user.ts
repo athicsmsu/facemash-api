@@ -22,7 +22,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-    const UserID = req.query.UserID;
+    const UserID = req.params.id;
     let sql = "select * from Users where UserID = ?";
     sql = mysql.format(sql, [
         UserID,
