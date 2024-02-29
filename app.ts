@@ -22,7 +22,3 @@ app.use("/", index);
 app.use("/user", user);
 app.use("/posts", posts);
 app.use("/vote", vote);
-
-// app.use("/", (req, res) => {
-// 	res.send("Hello World!!!");
-// });
