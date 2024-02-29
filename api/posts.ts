@@ -71,3 +71,18 @@ router.get("/", (req, res) => {
       }
   });
 });
+
+router.get("/:id", (req, res) => {
+  const UserID = req.params.id;
+  let sql = "select * from Posts where UserID = ?";
+  sql = mysql.format(sql, [
+      UserID
+  ]);
+  conn.query(sql, (err,result)=>{
+      if (err) {
+          res.status(400).json(err);
+      } else {
+          res.json(result);
+      }
+  });
+});
