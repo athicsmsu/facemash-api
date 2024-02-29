@@ -6,7 +6,7 @@ import { UserRequest } from "../model/user_req";
 
 export const router = express.Router();
 
-router.get("/password", (req, res) => {
+router.get("/", (req, res) => {
     const email = req.query.Email;
     let sql = "select Type,Password from Users where email = ?";
     sql = mysql.format(sql, [
