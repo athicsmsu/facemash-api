@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
         ]);
         conn.query(sql, (err,result)=>{
             if (err) {
-                res.send("pass n c");
+                res.status(400).json(err);
             } else {
                 res.json(result);
             }
