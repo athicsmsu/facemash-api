@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
     const email = req.query.Email;
     let sql = "select Type,Password,UserID from Users where email = ?";
     sql = mysql.format(sql, [
-        email,
+        email
     ]);
     conn.query(sql, (err,result)=>{
         if (err) {
