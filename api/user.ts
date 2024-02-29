@@ -6,23 +6,17 @@ import { UserRequest } from "../model/user_req";
 
 export const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/password", (req, res) => {
     const email = req.query.Email;
-    const password = req.query.Password;
-    let sql = "select * from Users where email = ?";
+    let sql = "select Type,Password from Users where email = ?";
     sql = mysql.format(sql, [
         email,
     ]);
     conn.query(sql, (err,result)=>{
         if (err) {
-            res.status(400).json(err);
+            res.status(401).json(err);
         } else {
-            if(result.Password.includes(password)){
-                res.send(true);
-            }
-            else {
-                res.send(false);
-            }
+            res.json(result);
         }
     });
 });
