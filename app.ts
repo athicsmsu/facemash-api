@@ -11,7 +11,7 @@ export const app = express();
 import cors from "cors";
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:4200",
   })
 );
 
