@@ -18,6 +18,17 @@ router.get("/", (req, res) => {
     });
 });
 
+router.get("/rank", (req, res) => {
+    let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC";
+    conn.query(sql, (err,result)=>{
+        if (err) {
+            res.status(400).json(err);
+        } else {
+            res.json(result);
+        }
+    });
+});
+
 router.post("/win", (req, res) => {
     const vote: VoteRequest = req.body;
     console.log(req.body);
