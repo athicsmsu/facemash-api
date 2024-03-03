@@ -43,9 +43,6 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const metaData = { contentType : req.file!.mimetype };
     const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
     const url = await getDownloadURL(snapshot.ref);
-    res.status(200).json({ 
-        filename: url 
-    });
 
     let sql = "INSERT INTO `Posts`(`UserID`, `ImageURL`) VALUES (?,?)";
     sql = mysql.format(sql, [
@@ -54,10 +51,10 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     ]);
     conn.query(sql, (err, result) => {
         if (err) throw err;
-        // res.status(201).json({
-        //     affected_row: result.affectedRows, 
-        //     last_idx: result.insertId
-        // });
+        res.status(201).json({
+            affected_row: result.affectedRows, 
+            last_idx: result.insertId
+        });
     });
 });
 

@@ -133,9 +133,9 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     ]);
     conn.query(sql, (err, result) => {
         if (err) throw err;
-        // res.status(201).json({
-        //     affected_row: result.affectedRows, 
-        //     last_idx: result.insertId
-        // });
+        res.status(201).json({
+            affected_row: result.affectedRows, 
+            last_idx: result.insertId
+        });
     });
 });

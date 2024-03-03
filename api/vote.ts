@@ -29,6 +29,26 @@ router.get("/rank", (req, res) => {
     });
 });
 
+router.post("/newposts", (req, res) => {
+    const vote: VoteRequest = req.body;
+    console.log(req.body);
+
+    if(true){
+        let sql = "INSERT INTO `Votes`(`Pid`, `score`,`vote_time`) VALUES (?,?,CURRENT_TIME())";
+            sql = mysql.format(sql, [
+            vote.Pid,
+            1000
+        ]);
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.status(201).json({ 
+                affected_row: result.affectedRows, 
+                last_idx: result.insertId 
+            });
+        });
+    }
+});
+
 router.post("/win", (req, res) => {
     const vote: VoteRequest = req.body;
     console.log(req.body);
