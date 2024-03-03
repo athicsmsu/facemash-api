@@ -10,13 +10,13 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/
 import { conn } from "../dbconnect";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCBH_sntU282PiEt7p_LHoJZmlmoAq1Hb8",
-  authDomain: "posts-upload.firebaseapp.com",
-  projectId: "posts-upload",
-  storageBucket: "posts-upload.appspot.com",
-  messagingSenderId: "1091740669318",
-  appId: "1:1091740669318:web:f8a5040e9f08a47bd58807",
-  measurementId: "G-M0MNWQXC5Q"
+    apiKey: "AIzaSyCI363cN5s4fKAyfgBG6T8TcXxcua-e6ZE",
+    authDomain: "facemash-msu.firebaseapp.com",
+    projectId: "facemash-msu",
+    storageBucket: "facemash-msu.appspot.com",
+    messagingSenderId: "245009169704",
+    appId: "1:245009169704:web:10f6dbc7041259c3e3e41d",
+    measurementId: "G-9PDEXGKE9H"
 };
 
 initializeApp(firebaseConfig);
