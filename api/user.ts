@@ -125,16 +125,13 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
         if (err) {
             res.status(400).json(err);
         }
-        const imagePath = result[0].ImageURL; // Assuming ImageURL contains the filename
+        const imagePath = result[0].Avatar; // Assuming ImageURL contains the filename
         if(imagePath == null){
             const filename = Math.round(Math.random() * 10000) + ".png";
             const storageRef = ref(storage,"/Avatar/"+filename);
             const metaData = { contentType : req.file!.mimetype };
             const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
             const url = await getDownloadURL(snapshot.ref);
-            res.status(200).json({
-                filename: url 
-            });
             let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
             sql = mysql.format(sql, [
                 url,
@@ -152,19 +149,14 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
             const storageRefOld = ref(storage, imagePath);
             try {
                 await deleteObject(storageRefOld);
-                console.log('Image deleted successfully');
             } catch (error) {
                 res.status(501).json({ error: 'Error deleting image from storage' });
-                return;
             }
             const filename = Math.round(Math.random() * 10000) + ".png";
             const storageRef = ref(storage,"/Avatar/"+filename);
             const metaData = { contentType : req.file!.mimetype };
             const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
             const url = await getDownloadURL(snapshot.ref);
-            res.status(200).json({
-                filename: url 
-            });
             let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
             sql = mysql.format(sql, [
                 url,
