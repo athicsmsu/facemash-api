@@ -39,7 +39,7 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const UserID = req.params.id;
 
     const filename = Math.round(Math.random() * 10000) + ".png";
-    const storageRef = ref(storage,"/images/"+filename);
+    const storageRef = ref(storage,"/images/"+filename);    
     const metaData = { contentType : req.file!.mimetype };
     const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
     const url = await getDownloadURL(snapshot.ref);
@@ -101,22 +101,33 @@ router.get("/:id", (req, res) => {
 
 router.delete("/:id", (req, res) => {
     const Pid = req.params.id;
-    let sql = "delete from Posts where Pid = ?";
-    // const desertRef = ref(storage, 'images/desert.jpg');
-
-    // // Delete the file
-    // deleteObject(desertRef).then(() => {
-    // // File deleted successfully
-    // }).catch((error) => {
-    // // Uh-oh, an error occurred!
-    // });
+    
+    let sql = "SELECT ImageURL FROM Posts WHERE Pid = ?";
     sql = mysql.format(sql, [
         Pid
     ]);
-    conn.query(sql, (err,result)=>{
-        if (err) throw err;
-        res.status(201).json({
-            affected_row: result.affectedRows
+    conn.query(sql, async (err, result)=>{
+        if (err) {
+            res.status(400).json(err);
+        }
+        const imagePath = result[0].ImageURL; // Assuming ImageURL contains the filename
+        sql = "DELETE FROM Posts WHERE Pid = ?";
+        // Construct the storage reference using the correct path
+        const storageRef = ref(storage, imagePath);
+        
+        try {
+            await deleteObject(storageRef);
+            console.log('Image deleted successfully');
+        } catch (error) {
+            res.status(501).json({ error: 'Error deleting image from storage' });
+            return;
+        }
+        
+        conn.query(sql, [Pid], (err, result) => {
+            if (err) throw err;
+            res.status(201).json({
+                affected_row: result.affectedRows
+            });
         });
     });
 });
