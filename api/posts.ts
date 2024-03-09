@@ -6,7 +6,7 @@ import mysql from "mysql";
 export const router = express.Router();
 
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, deleteObject, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { conn } from "../dbconnect";
 
 const firebaseConfig = {
@@ -20,8 +20,8 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig);
-
 const storage = getStorage();
+
 class FileMiddleware {
   filename = "";
   public readonly diskLoader = multer({
@@ -97,4 +97,26 @@ router.get("/:id", (req, res) => {
           res.json(result);
       }
   });
+});
+
+router.delete("/:id", (req, res) => {
+    const Pid = req.params.id;
+    let sql = "delete from Posts where Pid = ?";
+    // const desertRef = ref(storage, 'images/desert.jpg');
+
+    // // Delete the file
+    // deleteObject(desertRef).then(() => {
+    // // File deleted successfully
+    // }).catch((error) => {
+    // // Uh-oh, an error occurred!
+    // });
+    sql = mysql.format(sql, [
+        Pid
+    ]);
+    conn.query(sql, (err,result)=>{
+        if (err) throw err;
+        res.status(201).json({
+            affected_row: result.affectedRows
+        });
+    });
 });

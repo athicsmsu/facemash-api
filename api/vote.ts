@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/rank", (req, res) => {
-    let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC";
+    let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC LIMIT 10";
     conn.query(sql, (err,result)=>{
         if (err) {
             res.status(400).json(err);
