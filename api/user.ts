@@ -86,7 +86,7 @@ router.put("/:id", async (req, res) => {
 
 import multer from "multer";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCI363cN5s4fKAyfgBG6T8TcXxcua-e6ZE",
@@ -117,25 +117,66 @@ const fileUpload = new FileMiddleware();
 router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const UserID = req.params.id;
 
-    const filename = Math.round(Math.random() * 10000) + ".png";
-    const storageRef = ref(storage,"/Avatar/"+filename);
-    const metaData = { contentType : req.file!.mimetype };
-    const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
-    const url = await getDownloadURL(snapshot.ref);
-    res.status(200).json({ 
-        filename: url 
-    });
-
-    let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
-    sql = mysql.format(sql, [
-        url,
+    let select = "SELECT Avatar FROM Users WHERE UserID = ?";
+    select = mysql.format(select, [
         UserID
     ]);
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        res.status(201).json({
-            affected_row: result.affectedRows, 
-            last_idx: result.insertId
-        });
+    conn.query(select, async (err, result)=>{
+        if (err) {
+            res.status(400).json(err);
+        }
+        const imagePath = result[0].ImageURL; // Assuming ImageURL contains the filename
+        if(imagePath == null){
+            const filename = Math.round(Math.random() * 10000) + ".png";
+            const storageRef = ref(storage,"/Avatar/"+filename);
+            const metaData = { contentType : req.file!.mimetype };
+            const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
+            const url = await getDownloadURL(snapshot.ref);
+            res.status(200).json({
+                filename: url 
+            });
+            let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
+            sql = mysql.format(sql, [
+                url,
+                UserID
+            ]);
+            conn.query(sql, (err, result) => {
+                if (err) throw err;
+                res.status(201).json({
+                    affected_row: result.affectedRows, 
+                    last_idx: result.insertId
+                });
+            });
+        } else {
+            // Construct the storage reference using the correct path
+            const storageRefOld = ref(storage, imagePath);
+            try {
+                await deleteObject(storageRefOld);
+                console.log('Image deleted successfully');
+            } catch (error) {
+                res.status(501).json({ error: 'Error deleting image from storage' });
+                return;
+            }
+            const filename = Math.round(Math.random() * 10000) + ".png";
+            const storageRef = ref(storage,"/Avatar/"+filename);
+            const metaData = { contentType : req.file!.mimetype };
+            const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
+            const url = await getDownloadURL(snapshot.ref);
+            res.status(200).json({
+                filename: url 
+            });
+            let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
+            sql = mysql.format(sql, [
+                url,
+                UserID
+            ]);
+            conn.query(sql, (err, result) => {
+                if (err) throw err;
+                res.status(201).json({
+                    affected_row: result.affectedRows, 
+                    last_idx: result.insertId
+                });
+            });
+        }
     });
 });
