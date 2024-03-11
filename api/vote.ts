@@ -2,7 +2,6 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { queryAsync } from "../dbconnect";
-import { UserRequest } from "../model/user_req";
 import { VoteRequest } from "../model/vote_req";
 
 export const router = express.Router();
