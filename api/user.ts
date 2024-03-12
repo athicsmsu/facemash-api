@@ -84,6 +84,53 @@ router.put("/:id", async (req, res) => {
     });
 });
 
+  router.post("/edit", (req, res)=>{
+    const UserID = req.body.UserID;
+    const oldPass = req.body.oldPass;
+    const newPass = req.body.newPass;
+    const cfPass = req.body.cfPass;
+    
+
+    let select = "select * from Users where UserID = ? ";
+    select = mysql.format(select, [
+        UserID
+    ]);
+
+    conn.query(select, (err, result)=>{
+        if(err) throw err;
+        if (oldPass == result[0].Password) {
+            if (newPass == cfPass) {
+                let sql = "UPDATE `Users` SET `Password`= ? WHERE `UserID`= ?";
+                sql = mysql.format(sql, [
+                cfPass,
+                UserID
+                ]);
+                conn.query(sql, (err, result)=>{
+                if(err) throw err;
+                    res.status(200).json({
+                        affected_row: result.affectedRows
+                    });
+                });
+            }
+            else{
+                res.status(200).json({
+                    result: "Not_Math"
+                });
+            }
+            
+        }
+        else{
+            res.status(200).json({
+                result: "Not_Password"
+            });
+        }
+        
+    });
+});
+
+            
+        
+
 import multer from "multer";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
