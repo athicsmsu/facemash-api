@@ -122,8 +122,8 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const metaData = { contentType : req.file!.mimetype };
     const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
     const url = await getDownloadURL(snapshot.ref);
-    res.status(200).json({ 
-        filename: url 
+    res.status(200).json({
+        filename: url
     });
 
     let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
