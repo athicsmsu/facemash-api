@@ -145,4 +145,61 @@ router.get("/image/:id", (req, res) => {
             res.json(result);
         }
     });
-  });
+});
+
+router.post("/updatePosts/:Pid/:UserID", fileUpload.diskLoader.single("file"), async (req, res) => {
+    const Pid = req.params.Pid;
+    const UserID = req.params.UserID;
+    
+    let select = "SELECT ImageURL FROM Posts WHERE Pid = ?";
+    select = mysql.format(select, [
+        Pid
+    ]);
+    conn.query(select, async (err, result)=>{
+        if (err) {
+            res.status(400).json(err);
+        }
+        const imagePath = result[0].ImageURL; // Assuming ImageURL contains the filename
+        let DELETE = "DELETE FROM Posts WHERE Pid = ?";
+        // Construct the storage reference using the correct path
+        const storageRef = ref(storage, imagePath); 
+        try {
+            await deleteObject(storageRef);
+            console.log('Image deleted successfully');
+        } catch (error) {
+            res.status(501).json({ error: 'Error deleting image from storage' });
+            return;
+        }
+        conn.query(DELETE, [Pid], (err, result) => {
+            if (err) throw err;
+        });
+    });
+
+    const filename = Math.round(Math.random() * 10000) + ".png";
+    const storageRef = ref(storage,"/images/"+filename);    
+    const metaData = { contentType : req.file!.mimetype };
+    const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
+    const url = await getDownloadURL(snapshot.ref);
+    
+    let sql = "INSERT INTO `Posts`(`UserID`, `ImageURL`) VALUES (?,?)";
+    sql = mysql.format(sql, [
+        UserID,
+        url
+    ]);
+    console.log(sql);
+    conn.query(sql, (err, result) => {
+        if (err) throw err;
+        let sql = "INSERT INTO `Votes`(`Pid`, `score`,`vote_time`) VALUES (?,?,CURRENT_TIME())";
+            sql = mysql.format(sql, [
+            result.insertId,
+            1000
+        ]);
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.status(201).json({ 
+                affected_row: result.affectedRows, 
+                last_idx: result.insertId 
+            });
+        });
+    });
+});

@@ -117,6 +117,23 @@ const fileUpload = new FileMiddleware();
 router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const UserID = req.params.id;
 
+    let select = "SELECT Avatar FROM Users WHERE UserID = ?";
+    select = mysql.format(select, [
+        UserID
+    ]);
+    conn.query(select, async (err, result)=>{
+        if (err) {
+            res.status(400).json(err);
+        }
+        const imagePath = result[0].Avatar;
+        const storageRef = ref(storage, imagePath); 
+        try {
+            await deleteObject(storageRef);
+            console.log('Image deleted successfully');
+        } catch (error) {
+        }
+    });
+
     const filename = Math.round(Math.random() * 10000) + ".png";
     const storageRef = ref(storage,"/Avatar/"+filename);
     const metaData = { contentType : req.file!.mimetype };
