@@ -167,7 +167,7 @@ router.post("/updatePosts/:Pid/:UserID", fileUpload.diskLoader.single("file"), a
             await deleteObject(storageRef);
             console.log('Image deleted successfully');
         } catch (error) {
-            res.status(501).json({ error: 'Error deleting image from storage' });
+            res.status(501).json({ error: 'Erro deleting image from storage' });
             return;
         }
         conn.query(DELETE, [Pid], (err, result) => {
