@@ -30,3 +30,19 @@ router.get("/:id", (req, res) => {
         }
     });
 });
+
+router.get("/grahp/:id", (req, res) => {
+    
+    const Pid = req.params.id;
+
+    let sql = "select * from Dailystats Where Pid = ? ORDER BY Did DESC LIMIT 7";
+    sql = mysql.format(sql, [
+        Pid
+    ]);
+    conn.query(sql, (err,result)=>{
+        if(err) throw err;
+        else {
+          res.json(result);
+        }
+    });
+});
