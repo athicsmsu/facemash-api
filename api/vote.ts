@@ -2,7 +2,6 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { queryAsync } from "../dbconnect";
-import { UserRequest } from "../model/user_req";
 import { VoteRequest } from "../model/vote_req";
 
 export const router = express.Router();
@@ -19,7 +18,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/rank", (req, res) => {
-    let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC";
+    let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC LIMIT 10";
     conn.query(sql, (err,result)=>{
         if (err) {
             res.status(400).json(err);
@@ -27,6 +26,26 @@ router.get("/rank", (req, res) => {
             res.json(result);
         }
     });
+});
+
+router.post("/newposts", (req, res) => {
+    const vote: VoteRequest = req.body;
+    console.log(req.body);
+
+    if(true){
+        let sql = "INSERT INTO `Votes`(`Pid`, `score`,`vote_time`) VALUES (?,?,CURRENT_TIME())";
+            sql = mysql.format(sql, [
+            vote.Pid,
+            1000
+        ]);
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.status(201).json({ 
+                affected_row: result.affectedRows, 
+                last_idx: result.insertId 
+            });
+        });
+    }
 });
 
 router.post("/win", (req, res) => {

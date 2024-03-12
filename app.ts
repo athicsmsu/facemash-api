@@ -4,6 +4,7 @@ import { router as index } from "./api/index";
 import { router as user } from "./api/user";
 import { router as posts } from "./api/posts";
 import { router as vote } from "./api/vote";
+import { router as dailystats } from "./api/dailystats";
 
 import bodyParser from "body-parser";
 
@@ -22,3 +23,4 @@ app.use("/", index);
 app.use("/user", user);
 app.use("/posts", posts);
 app.use("/vote", vote);
+app.use("/dailystats", dailystats);
