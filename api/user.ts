@@ -89,7 +89,6 @@ router.put("/:id", async (req, res) => {
     const oldPass = req.body.oldPass;
     const newPass = req.body.newPass;
     const cfPass = req.body.cfPass;
-    
 
     let select = "select * from Users where UserID = ? ";
     select = mysql.format(select, [
@@ -108,7 +107,7 @@ router.put("/:id", async (req, res) => {
                 conn.query(sql, (err, result)=>{
                 if(err) throw err;
                     res.status(200).json({
-                        affected_row: result.affectedRows
+                        result: "success"
                     });
                 });
             }
