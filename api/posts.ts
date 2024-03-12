@@ -131,3 +131,18 @@ router.delete("/:id", (req, res) => {
         });
     });
 });
+
+router.get("/image/:id", (req, res) => {
+    const Pid = req.params.id;
+    let sql = "select * from Posts where Pid = ?";
+    sql = mysql.format(sql, [
+        Pid
+    ]);
+    conn.query(sql, (err,result)=>{
+        if (err) {
+            res.status(400).json(err);
+        } else {
+            res.json(result);
+        }
+    });
+  });
