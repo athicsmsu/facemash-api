@@ -5,7 +5,7 @@ import { queryAsync } from "../dbconnect";
 import { UserRequest } from "../model/user_req";
 
 export const router = express.Router();
-
+//ไว้เช็ค email และ password
 router.get("/", (req, res) => {
     const email = req.query.Email;
     let sql = "select Type,Password,UserID,Email from Users where email = ?";
@@ -21,6 +21,7 @@ router.get("/", (req, res) => {
     });
 });
 
+//ไว้เอาข้อมูลทุกอย่างของ user
 router.get("/:id", (req, res) => {
     const UserID = req.params.id;
     let sql = "select * from Users where UserID = ?";
@@ -36,6 +37,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
+//ไว้ sign up User
 router.post("/", (req, res) => {
     const user: UserRequest = req.body;
     console.log(req.body);
@@ -56,6 +58,7 @@ router.post("/", (req, res) => {
     });
 });
 
+//เปลี่ยนข้อมูลของ User
 router.put("/:id", async (req, res) => {
     const id = req.params.id;
     const user: UserRequest = req.body;
@@ -84,6 +87,7 @@ router.put("/:id", async (req, res) => {
     });
 });
 
+//เปลี่ยนรหัสผ่านของ User
   router.post("/edit", (req, res)=>{
     const UserID = req.body.UserID;
     const oldPass = req.body.oldPass;
@@ -160,6 +164,7 @@ class FileMiddleware {
 
 const fileUpload = new FileMiddleware();
 
+//เปลี่ยน Avatar ของ User
 router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     const UserID = req.params.id;
 

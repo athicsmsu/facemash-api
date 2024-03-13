@@ -69,11 +69,11 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/score/:id", (req, res) => {
-  const Pid = req.params.id;
-  let sql = "SELECT SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid WHERE Votes.Pid = ?";
+router.get("/:id", (req, res) => {
+  const UserID = req.params.id;
+  let sql = "select * from Posts where UserID = ?";
   sql = mysql.format(sql, [
-      Pid
+      UserID
   ]);
   conn.query(sql, (err,result)=>{
       if (err) {
@@ -84,11 +84,11 @@ router.get("/score/:id", (req, res) => {
   });
 });
 
-router.get("/:id", (req, res) => {
-  const UserID = req.params.id;
-  let sql = "select * from Posts where UserID = ?";
+router.get("/score/:id", (req, res) => {
+  const Pid = req.params.id;
+  let sql = "SELECT SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid WHERE Votes.Pid = ?";
   sql = mysql.format(sql, [
-      UserID
+      Pid
   ]);
   conn.query(sql, (err,result)=>{
       if (err) {

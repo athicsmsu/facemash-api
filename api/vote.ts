@@ -17,6 +17,7 @@ router.get("/", (req, res) => {
     });
 });
 
+//หน้าranking
 router.get("/rank", (req, res) => {
     let sql = "SELECT Posts.Pid, Posts.ImageURL,SUM(Votes.score) AS total_score FROM Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Posts.Pid ORDER BY total_score DESC LIMIT 10";
     conn.query(sql, (err,result)=>{
@@ -28,6 +29,7 @@ router.get("/rank", (req, res) => {
     });
 });
 
+//เวลาเพิ่มรูปภาพใหม่ให้เพิ่มคะแนน 1000 ด้วย
 router.post("/newposts", (req, res) => {
     const vote: VoteRequest = req.body;
     console.log(req.body);
@@ -89,20 +91,17 @@ router.post("/lose", (req, res) => {
     }
 });
 
+//เอาrankปัจจุบันออกมาโชว์ทั้งหมด แล้วค่อยไปเปรียบเทียบใน front ถ้า Pid ตรงกัน
 router.get("/nowRank", (req, res) => {
 
     let sql = "SELECT pid, SUM(score) AS total_score, "+ 
     "FIND_IN_SET(pid, ( "+ 
-        "SELECT GROUP_CONCAT(pid ORDER BY total_score DESC) "+ 
-        "FROM ( "+ 
-            "SELECT pid, SUM(score) AS total_score "+ 
-            "FROM Votes "+ 
-            "GROUP BY pid "+ 
-        ") AS scores "+ 
+    "SELECT GROUP_CONCAT(pid ORDER BY total_score DESC) "+ 
+    "FROM (SELECT pid, SUM(score) AS total_score FROM Votes GROUP BY pid) AS scores "+ 
     ")) AS `rank` "+ 
-"FROM Votes "+ 
-"GROUP BY pid "+ 
-"ORDER BY total_score DESC;";
+    "FROM Votes "+ 
+    "GROUP BY pid "+ 
+    "ORDER BY total_score DESC;";
     conn.query(sql, (err,result)=>{
         if(err) throw err;
         else {

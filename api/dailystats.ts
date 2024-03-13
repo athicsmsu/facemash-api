@@ -31,8 +31,8 @@ router.get("/:id", (req, res) => {
     });
 });
 
+//เอาวันที่และสถิติ 7 วันออกมา โดยวันที่formatเอาแค่วันเก็บไว้ในตัวแปล formatted_date
 router.get("/grahp/:id", (req, res) => {
-    
     const Pid = req.params.id;
 
     let sql = "SELECT *, DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date "+
