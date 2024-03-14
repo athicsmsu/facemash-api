@@ -5,6 +5,24 @@ import { queryAsync } from "../dbconnect";
 import { UserRequest } from "../model/user_req";
 
 export const router = express.Router();
+
+
+//ไว้เอาข้อมูลทุกอย่างของ user ทุกคน
+router.get("/userAll", (req, res) => {
+    const email = req.query.Email;
+    let sql = "select * from Users*";
+    sql = mysql.format(sql, [
+        email
+    ]);
+    conn.query(sql, (err,result)=>{
+        if (err) {
+            res.status(401).json(err);
+        } else {
+            res.json(result);
+        }
+    });
+});
+
 //ไว้เช็ค email และ password
 router.get("/", (req, res) => {
     const email = req.query.Email;
@@ -21,7 +39,7 @@ router.get("/", (req, res) => {
     });
 });
 
-//ไว้เอาข้อมูลทุกอย่างของ user
+//ไว้เอาข้อมูลทุกอย่างของ user คนนั้นๆ
 router.get("/:id", (req, res) => {
     const UserID = req.params.id;
     let sql = "select * from Users where UserID = ?";
