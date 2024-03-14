@@ -10,7 +10,7 @@ export const router = express.Router();
 //ไว้เอาข้อมูลทุกอย่างของ user ทุกคน
 router.get("/userAll", (req, res) => {
     const email = req.query.Email;
-    let sql = "select * from Users*";
+    let sql = "select * from Users";
     sql = mysql.format(sql, [
         email
     ]);
