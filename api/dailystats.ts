@@ -38,7 +38,7 @@ router.get("/grahp/:id", (req, res) => {
     let sql = "SELECT *, DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date "+
     "FROM Dailystats "+
     "WHERE Pid = ? "+
-    "ORDER BY Did "+
+    "ORDER BY Did DESC "+
     "LIMIT 7;";
     sql = mysql.format(sql, [
         Pid
