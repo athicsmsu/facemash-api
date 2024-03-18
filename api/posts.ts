@@ -58,6 +58,7 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
     });
 });
 
+//ไว้เรียกทุกอย่างไปแสดงในหน้า main 
 router.get("/", (req, res) => {
   let sql = "SELECT SUM(Votes.score) AS total_score, Posts.*, Users.* "+
   "FROM Posts "+
@@ -65,7 +66,7 @@ router.get("/", (req, res) => {
   "JOIN Users ON Posts.UserID = Users.UserID "+
   "GROUP BY Posts.Pid, Users.UserID "+
   "ORDER BY Posts.UserID "
-  
+
   conn.query(sql, (err,result)=>{
       if (err) {
           res.status(400).json(err);
