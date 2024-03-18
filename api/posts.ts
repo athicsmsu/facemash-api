@@ -59,7 +59,13 @@ router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  let sql = "select SUM(Votes.score) AS total_score,Posts.* from Posts JOIN Votes ON Posts.Pid = Votes.Pid GROUP BY Pid";
+  let sql = "SELECT SUM(Votes.score) AS total_score, Posts.*, Users.* "+
+  "FROM Posts "+
+  "JOIN Votes ON Posts.Pid = Votes.Pid "+
+  "JOIN Users ON Posts.UserID = Users.UserID "+
+  "GROUP BY Posts.Pid, Users.UserID "+
+  "ORDER BY Posts.UserID "
+  
   conn.query(sql, (err,result)=>{
       if (err) {
           res.status(400).json(err);
