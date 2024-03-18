@@ -5,7 +5,7 @@ import mysql from "mysql";
 export const router = express.Router();
 
 router.get("/", (req, res) => {
-    let sql = "select * from Dailystats";
+    let sql = "select * from Dailystats ";
     conn.query(sql, (err,result)=>{
         if (err) {
             res.status(400).json(err);
@@ -19,7 +19,7 @@ router.get("/:id", (req, res) => {
     
     const Pid = req.params.id;
 
-    let sql = "select * from Dailystats Where Pid = ? ORDER BY Did DESC LIMIT 7";
+    let sql = "select * from Dailystats Where Pid = ? ORDER BY Did DESC LIMIT 1";
     sql = mysql.format(sql, [
         Pid
     ]);
