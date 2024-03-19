@@ -19,14 +19,19 @@ router.get("/", (req, res) => {
 
 //หน้าranking
 router.get("/rank", (req, res) => {
-    let sql = "SELECT Posts.Pid, Posts.ImageURL, SUM(Votes.score) AS total_score, Dailystats.* "+
-    "FROM Posts "+
-    "JOIN Votes ON Posts.Pid = Votes.Pid "+
-    "JOIN Dailystats ON Posts.Pid = Dailystats.Pid "+
-    "WHERE Dailystats.date = CURDATE() - INTERVAL 1 DAY "+
-    "GROUP BY Posts.Pid, Dailystats.Did "+
-    "ORDER BY total_score DESC "+
-    "LIMIT 10;";
+    let sql = "SELECT Posts.Pid, Posts.ImageURL, total_score, Dailystats.* "+
+    "FROM ( "+
+    "    SELECT Posts.Pid, SUM(Votes.score) AS total_score "+
+    "    FROM Posts "+
+    "    JOIN Votes ON Posts.Pid = Votes.Pid "+
+    "    GROUP BY Posts.Pid "+
+    "    ORDER BY total_score DESC "+
+    "    LIMIT 10 "+
+    ") AS TopPosts "+
+    "JOIN Posts ON TopPosts.Pid = Posts.Pid "+
+    "LEFT JOIN Dailystats ON Posts.Pid = Dailystats.Pid "+
+    "WHERE Dailystats.date = CURDATE() - INTERVAL 1 DAY OR Dailystats.Pid IS NULL "+
+    "ORDER BY total_score DESC; ";
     conn.query(sql, (err,result)=>{
         if (err) {
             res.status(400).json(err);
