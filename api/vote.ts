@@ -109,7 +109,7 @@ router.get("/nowRank", (req, res) => {
     let sql = "SELECT pid, SUM(score) AS total_score, "+ 
     "FIND_IN_SET(pid, ( "+ 
     "SELECT GROUP_CONCAT(pid ORDER BY total_score DESC) "+ 
-    "FROM (SELECT pid, SUM(score) AS total_score FROM Votes GROUP BY pid) AS scores "+ 
+    "FROM (SELECT pid, SUM(score) AS total_score FROM Votes GROUP BY pid ORDER BY total_score DESC) AS scores "+ 
     ")) AS `rank` "+ 
     "FROM Votes "+ 
     "GROUP BY pid "+ 
