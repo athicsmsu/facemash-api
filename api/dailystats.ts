@@ -39,7 +39,7 @@ router.get("/grahp/:id", (req, res) => {
     "FROM Dailystats "+
     "WHERE Pid = ? "+
     "ORDER BY Did DESC "+
-    "LIMIT 7;";
+    "LIMIT 6;";
     sql = mysql.format(sql, [
         Pid
     ]);
