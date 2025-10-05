@@ -216,8 +216,8 @@ router.post("/:id", upload.single("file"), async (req, res) => {
         // อัปโหลดไฟล์ใหม่ไป Firebase Storage
         const filename = Math.round(Math.random() * 10000) + ".png";
         const storageRef = ref(storage, "/Avatar/" + filename);
-        const metaData = { contentType: req.file.mimetype };
-        const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metaData);
+        const metaData = { contentType: req.file!.mimetype };
+        const snapshot = await uploadBytesResumable(storageRef, req.file!.buffer, metaData);
         const url = await getDownloadURL(snapshot.ref);
 
         // อัปเดตใน DB
