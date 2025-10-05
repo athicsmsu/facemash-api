@@ -182,46 +182,50 @@ class FileMiddleware {
 
 const fileUpload = new FileMiddleware();
 
-//เปลี่ยน Avatar ของ User
-router.post("/:id", fileUpload.diskLoader.single("file"), async (req, res) => {
+// ตั้งค่า multer memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 64 * 1024 * 1024 } // 64 MB
+});
+
+// เปลี่ยน Avatar ของ User
+router.post("/:id", upload.single("file"), async (req, res) => {
     const UserID = req.params.id;
 
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // ลบไฟล์เก่าจาก Firebase Storage
     let select = "SELECT Avatar FROM Users WHERE UserID = ?";
-    select = mysql.format(select, [
-        UserID
-    ]);
-    conn.query(select, async (err, result)=>{
-        if (err) {
-            res.status(400).json(err);
-        }
-        const imagePath = result[0].Avatar;
-        const storageRef = ref(storage, imagePath); 
-        try {
-            await deleteObject(storageRef);
-            console.log('Image deleted successfully');
-        } catch (error) {
-        }
-    });
+    select = mysql.format(select, [UserID]);
+    conn.query(select, async (err, result) => {
+        if (err) return res.status(400).json(err);
 
-    const filename = Math.round(Math.random() * 10000) + ".png";
-    const storageRef = ref(storage,"/Avatar/"+filename);
-    const metaData = { contentType : req.file!.mimetype };
-    const snapshot = await uploadBytesResumable(storageRef,req.file!.buffer,metaData)
-    const url = await getDownloadURL(snapshot.ref);
-    res.status(200).json({ 
-        filename: url 
-    });
+        const imagePath = result[0]?.Avatar;
+        if (imagePath) {
+            const storageRefOld = ref(storage, imagePath);
+            try {
+                await deleteObject(storageRefOld);
+                console.log("Old image deleted");
+            } catch (error) {
+                console.log("No old image to delete");
+            }
+        }
 
-    let sql = "update  `Users` set `Avatar`=?  where `UserID`=?";
-    sql = mysql.format(sql, [
-        url,
-        UserID
-    ]);
-    conn.query(sql, (err, result) => {
-        if (err) throw err;
-        // res.status(201).json({
-        //     affected_row: result.affectedRows, 
-        //     last_idx: result.insertId
-        // });
+        // อัปโหลดไฟล์ใหม่ไป Firebase Storage
+        const filename = Math.round(Math.random() * 10000) + ".png";
+        const storageRef = ref(storage, "/Avatar/" + filename);
+        const metaData = { contentType: req.file.mimetype };
+        const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metaData);
+        const url = await getDownloadURL(snapshot.ref);
+
+        // อัปเดตใน DB
+        let sql = "UPDATE `Users` SET `Avatar`=? WHERE `UserID`=?";
+        sql = mysql.format(sql, [url, UserID]);
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.status(200).json({ filename: url });
+        });
     });
 });
